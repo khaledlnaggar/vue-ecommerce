@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+p,h2,h1,span,a {
+    @apply text-black;
+}
+
+body {
+    @apply bg-white;
+}
