@@ -1,5 +1,27 @@
 <script setup lang="ts">
 const navs: string[] = ["New", "Men", "Women", "Kids", "Jordan", "Sports"];
+const { debounce, products } = useProducts();
+const searchInput = ref("");
+
+const getSearchedProducts = () => {
+  try {
+    const data = $fetch(
+      `https://dummyjson.com/products/search?q=${searchInput.value}`
+    );
+
+    data.then((res) => {
+      products.value = res;
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const searchForProduct = debounce(getSearchedProducts, 500);
+
+watch(searchInput, () => {
+  searchForProduct();
+});
 </script>
 <template>
   <div class="flex justify-between items-center w-full px-[2%]">
@@ -17,6 +39,7 @@ const navs: string[] = ["New", "Men", "Women", "Kids", "Jordan", "Sports"];
       >
         <Icon name="material-symbols:search-rounded" style="color: black" />
         <input
+          v-model="searchInput"
           class="outline-none w-[80%] placeholder:text-[#757575] text-[#757575]"
           type="text"
           placeholder="Search"

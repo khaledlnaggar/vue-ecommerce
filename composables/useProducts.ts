@@ -17,26 +17,58 @@ export const useProducts = () => {
   };
   const getProducts = async () => {
     const { data: response } = await useFetch<ProductListResponse>(
-      "https://dummyjson.com/products?limit=9"
+      "https://dummyjson.com/products?limit=9",
+      {
+        key: "products",
+      }
     );
     if (response.value) {
       products.value = response.value;
     }
   };
   const onPagination = (page: number) => {
-    const { data: response } = useFetch<ProductListResponse>(
-      `https://dummyjson.com/products?limit=9&skip=${page * 9}`
-    );
-    if (response.value) {
-      products.value = response.value;
-      console.log(products.value);
+    try {
+      const response = $fetch<ProductListResponse>(
+        `https://dummyjson.com/products?limit=9&skip=${page * 9}`
+      );
+      response.then((res) => {
+        products.value = res;
+      });
+    } catch (error) {
+      console.log(error);
     }
   };
   const onFiltering = (url: string) => {
-    const { data: response } = useFetch<ProductListResponse>(url);
-    if (response.value) {
-      products.value = response.value;
+    try {
+      const response = $fetch<ProductListResponse>(url);
+      response.then((res) => {
+        products.value = res;
+      });
+    } catch (error) {
+      console.log(error);
     }
+  };
+
+  const onSearch = (search: string) => {
+    try {
+      const response = $fetch<ProductListResponse>(
+        `https://dummyjson.com/products/search?q=${search}`
+      );
+      response.then((res) => {
+        products.value = res;
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const debounce = (callback: Function, delay: number) => {
+    let timeoutId: number;
+    return (...args: any) => {
+      clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => {
+        callback(...args);
+      }, delay);
+    };
   };
 
   return {
@@ -45,5 +77,6 @@ export const useProducts = () => {
     getProducts,
     onPagination,
     products,
+    debounce,
   };
 };
